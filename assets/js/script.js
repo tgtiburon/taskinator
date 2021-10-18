@@ -7,7 +7,11 @@ let tasksToDoEl = document.querySelector("#tasks-to-do");
 let tasksInProgressEl = document.querySelector("#tasks-in-progress");
 let tasksCompletedEl = document.querySelector("#tasks-completed");
 let pageContentEl = document.querySelector("#page-content");
+
+
 let taskIdCounter = 0;
+let tasks = [];
+
 
 var taskFormHandler = function(event) { 
 
@@ -42,7 +46,8 @@ var taskFormHandler = function(event) {
     else {
       let taskDataObj = {
         name: taskNameInput, 
-        type: taskTypeInput
+        type: taskTypeInput,
+        status: "to do"
       };
       createTaskEl(taskDataObj);
     }
@@ -73,8 +78,14 @@ let createTaskEl = function(taskDataObj) {
     listItemEl.appendChild(taskActionsEl);
     tasksToDoEl.appendChild(listItemEl);
 
+    taskDataObj.id = taskIdCounter;
+    // push puts any data on the end of an array.
+    tasks.push(taskDataObj);
     // increase the task counter for the next unique id
     taskIdCounter++;
+
+    console.log(taskDataObj);
+    console.log(taskDataObj.status);
 };//end createTaskEl()
 
 let createTaskActions = function(taskId) {
@@ -124,17 +135,23 @@ let completeEditTask = function(taskName, taskType, taskId) {
     // set new values
     taskSelected.querySelector("h3.task-name").textContent = taskName;
     taskSelected.querySelector("span.task-type").textContent = taskType;
-    alert("Task Updated!");
+    console.log("Task Updated!");
+    // loop through tasks array and task object with new content
+    // does the id = taskId    
+    // parseInt turns taskId into an integer.
+    for (let i = 0; i < tasks.length; i++) {
+      if(tasks[i].id === parseInt(taskId)) {
+        tasks[i].name = taskName;
+        tasks[i].taskType;
+      }
+      
+    };
 
 
     formEl.removeAttribute("data-task-id");
     document.querySelector("#save-task").textContent = "Add Task";
 
 };//end createTaskEl() 
-
- 
-
-  
 
  
 let taskButtonHandler = function(event) {
@@ -184,6 +201,21 @@ let deleteTask = function(taskId) {
     var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
     console.log(taskSelected);
     taskSelected.remove();
+
+    // create a new array to hold the updated list of tasks
+    let updatedTaskArr = [];
+
+    // loop through current tasks
+    for (var i=0; i<tasks.length; i++) {
+      // if tasks[i].id doesn't match the value of taskId, let's keep that task
+      // and push it onto the new array, otherwise don't add it (delete it)
+      if (tasks[i].id !== parseInt(taskId)) {
+        updatedTaskArr.push(tasks[i]);
+      }
+    }
+
+    // reassign tasks array to be the same as the new updatedTaskArr
+    tasks = updatedTaskArr;
 };// end deleteTask()
 
 let taskStatusChangeHandler = function(event) {
@@ -206,6 +238,15 @@ let taskStatusChangeHandler = function(event) {
   else if (statusValue === "completed") {
     tasksCompletedEl.appendChild(taskSelected);
   }
+
+  // update task's in the task array
+  for (var i=0; i< tasks.length; i++) {
+    if (tasks[i].id === parseInt(taskId)) {
+      tasks[i].status = statusValue;
+    }
+  }
+  console.log("tasks= ");
+  console.dir(tasks);
 
 };// end taskStatusChangeHandler()
  
